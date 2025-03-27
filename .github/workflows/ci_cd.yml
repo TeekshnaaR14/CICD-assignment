@@ -29,9 +29,23 @@ jobs:
 
       # Step 3: Lint Python code
       #### 
+      - name: Lint Python code
+        run: |
+          if [-f .flake8 ] || [ -f setup.cfg ] || [ -f tox.ini ] || [ -f .pep8 ]; then
+          flake8.
+          else
+          echo "No lint configuration found, skipping linting."
+          fi
 
       # Step 4: Run Python tests
-      ####
+      - name: Run Python test
+        run: |
+          if [ -f pytest.ini ] || ls test; then
+          pytest
+          else
+          echo "No tests found, skipping tests."
+          fi
+      
 
   deploy:
     name: Deploy & Push to Docker Hub
@@ -46,7 +60,7 @@ jobs:
         - name: List repository files
           run: ls -al
 
-    # Step 7: Build docker image 
+    # Step 5: Build docker image 
     # Go to dockerhub.com
     # Create a new repository - backend_flask
     # Create a new access token - <access_token>
@@ -55,6 +69,11 @@ jobs:
     # add the Environment name to the deploy job above (important step)
     # https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions
     #### 
+    
+        - name: Build Docker Image
+          run: |
+            docker build -t ${{ secrets.DOCKERHUB_USERNAME}}/backend_flask:latest .    
+    
 
     # Step 8: Log in to Docker Hub
     #### 
